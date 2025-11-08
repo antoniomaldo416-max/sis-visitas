@@ -1,15 +1,30 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
 from core.views import healthcheck
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from django.conf import settings
 from django.conf.urls.static import static
-
 from users.views import LoginView
 
 
+# ✅ Vista para la raíz (Render /)
+def home(request):
+    return JsonResponse({
+        "status": "ok",
+        "message": "Backend activo en Render 🚀",
+        "api_endpoints": {
+            "health": "/api/health/",
+            "users": "/api/users/",
+            "visits": "/api/visits/",
+            "reports": "/api/reports/",
+        }
+    })
+
+
 urlpatterns = [
+    path("", home, name="home"),  # ✅ raíz del sitio
     path("admin/", admin.site.urls),
     path("api/health/", healthcheck, name="healthcheck"),
 
@@ -29,19 +44,7 @@ urlpatterns = [
     path("api/auth/jwt/create/", LoginView.as_view(), name="jwt-create"),
     path("api/auth/jwt/refresh/", TokenRefreshView.as_view(), name="jwt-refresh"),
     path("api/auth/jwt/verify/", TokenVerifyView.as_view(), name="jwt-verify"),
-    # logout en users.urls -> /api/users/logout/
 ]
-
-# ✅ Vista raíz para Render (responde a "/")
-from django.http import JsonResponse
-
-def home(request):
-    return JsonResponse({"status": "ok", "message": "Backend activo en Render 🚀"})
-
-urlpatterns += [
-    path("", home, name="home"),  # <--- Agregado
-]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

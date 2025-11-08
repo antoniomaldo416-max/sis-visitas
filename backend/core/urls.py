@@ -32,5 +32,16 @@ urlpatterns = [
     # logout en users.urls -> /api/users/logout/
 ]
 
+# ✅ Vista raíz para Render (responde a "/")
+from django.http import JsonResponse
+
+def home(request):
+    return JsonResponse({"status": "ok", "message": "Backend activo en Render 🚀"})
+
+urlpatterns += [
+    path("", home, name="home"),  # <--- Agregado
+]
+
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
